@@ -14,12 +14,9 @@ let OUTPUT = '';
 Calc = (data) => {
   initial_array = data.split(",");
   initial_array = initial_array.map(val => Number(val));
-  Selection();
-}
-
-Selection = () => {
-      const val = IntCode(initial_array, 0);
-      console.log('OUTPUT =', OUTPUT);
+  
+  IntCode(initial_array, 0);
+  console.log('OUTPUT =', OUTPUT);
   }
 
 
