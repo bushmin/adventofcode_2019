@@ -73,109 +73,79 @@ IntCode = (arr, id) => {
   }
 }
 
+Address = (arr, id, mode) => {
+  switch (mode) {
+    case '0': return arr[id]
+    case '1': return id
+    case '2': return arr[id] + RELATIVE_BASE
+    default: return arr[id]     
+  }
+}
+
 Sum = (array, id, mode1, mode2, mode3) => {
-  let first = array[array[id + 1]];
-  if (mode1==1) first = array[id + 1];
-  if (mode1==2) first = array[array[id + 1] + RELATIVE_BASE];
-
-  let second = array[array[id + 2]];
-  if (mode2==1) second = array[id + 2];
-  if (mode2==2) second = array[array[id + 2] + RELATIVE_BASE];
-
-  if (mode3==2) array[array[id + 3] + RELATIVE_BASE] = first + second;
-  else array[array[id + 3]] = first + second;
+  const first = array[Address(array, id+1, mode1)];
+  const second = array[Address(array, id+2, mode2)];
+  array[Address(array, id+3, mode3)] = first + second;
   return array;
 }
 
 
 Multiply = (array, id, mode1, mode2, mode3) => {
-  let first = array[array[id + 1]];
-  if (mode1==1) first = array[id + 1];
-  if (mode1==2) first = array[array[id + 1] + RELATIVE_BASE];
-
-  let second = array[array[id + 2]];
-  if (mode2==1) second = array[id + 2];
-  if (mode2==2) second = array[array[id + 2] + RELATIVE_BASE];
+  const first = array[Address(array, id+1, mode1)];
+  const second = array[Address(array, id+2, mode2)];
 
   if (String(first).length+String(second).length>34) {
     console.log('too big of a number')
     return 0;
   } else {
-    if (mode3==2) array[array[id + 3] + RELATIVE_BASE] = first * second;
-    else array[array[id + 3]] = first * second;
+    array[Address(array, id+3, mode3)] = first * second;
+    return array;
   }
-  return array;
 }
 
 Input = (array, id, mode1) => {
-  if (mode1==2) array[array[id + 1] + RELATIVE_BASE] = INPUT;
-  else array[array[id + 1]] = INPUT;
+  array[Address(array, id+1, mode1)] = INPUT;
   return array;
 }
 
 Output = (array, id, mode1) => {
   OUTPUT += ', ';
-  if (mode1==1) { OUTPUT += String(array[id + 1]) }
-  else if (mode1==2) {OUTPUT += String(array[array[id + 1] + RELATIVE_BASE])}
-  else { OUTPUT += String(array[array[id + 1]]) }
+  OUTPUT += array[Address(array, id+1, mode1)]
   return array;
 }
 
 JumpIfTrue = (array, id, mode1, mode2, invert) => {
-  let value = array[array[id + 1]];
-  if (mode1==1) value = array[id + 1];
-  if (mode1==2) value = array[array[id + 1] + RELATIVE_BASE];
+  const value = array[Address(array, id+1, mode1)];
   let pointer = id+3;
   if (value==1 && !invert || (value==0 && invert=='invert')) {
-    pointer = array[array[id + 2]];
-    if (mode2==1) pointer = array[id + 2];
-    if (mode2==2) pointer = array[array[id + 2] + RELATIVE_BASE];
+    pointer = array[Address(array, id+2, mode2)];
   }
   return pointer;
 }
 
 LessThan = (array, id, mode1, mode2, mode3) => {
-  let first = array[array[id + 1]];
-  if (mode1==1) first = array[id + 1];
-  if (mode1==2) first = array[array[id + 1] + RELATIVE_BASE];
-
-  let second = array[array[id + 2]];
-  if (mode2==1) second = array[id + 2];
-  if (mode2==2) second = array[array[id + 2] + RELATIVE_BASE];
-
+  const first = array[Address(array, id+1, mode1)];
+  const second = array[Address(array, id+2, mode2)];
   if (first<second) {
-    if (mode3==2) array[array[id + 3] + RELATIVE_BASE] = 1;
-    else array[array[id + 3]] = 1;
-    
+    array[Address(array, id+3, mode3)] = 1;
   } else {
-    if (mode3==2) array[array[id + 3] + RELATIVE_BASE] = 0;
-    else array[array[id + 3]] = 0;
+    array[Address(array, id+3, mode3)] = 0;
   }
   return array;
 }
 
 Equals = (array, id, mode1, mode2, mode3) => {
-  let first = array[array[id + 1]];
-  if (mode1==1) first = array[id + 1];
-  if (mode1==2) first = array[array[id + 1] + RELATIVE_BASE];
-
-  let second = array[array[id + 2]];
-  if (mode2==1) second = array[id + 2];
-  if (mode2==2) second = array[array[id + 2] + RELATIVE_BASE];
-
+  const first = array[Address(array, id+1, mode1)];
+  const second = array[Address(array, id+2, mode2)];
   if (first==second) {
-    if (mode3==2) array[array[id + 3] + RELATIVE_BASE] = 1;
-    else array[array[id + 3]] = 1;
+    array[Address(array, id+3, mode3)] = 1;
   } else {
-    if (mode3==2) array[array[id + 3] + RELATIVE_BASE] = 0;
-    else array[array[id + 3]] = 0;
+    array[Address(array, id+3, mode3)] = 0;
   }
   return array;
 }
 
 ChangeBase = (array, id, mode1) => {
-  let base_diff = array[array[id + 1]];
-  if (mode1==1) base_diff = array[id + 1];
-  if (mode1==2) base_diff = array[array[id + 1] + RELATIVE_BASE];
+  const base_diff = array[Address(array, id+1, mode1)];
   RELATIVE_BASE += base_diff;
 }
